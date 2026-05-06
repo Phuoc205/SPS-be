@@ -2,7 +2,7 @@ package com.smartparking.parking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.smartparking.payment.entity.Pricing;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +22,9 @@ public class ParkingSession {
     private LocalDateTime checkInTime;
 
     private LocalDateTime checkOutTime;
+
+    @ManyToOne
+    private Pricing price;
 
     @ManyToOne
     private ParkingSlot slot;
