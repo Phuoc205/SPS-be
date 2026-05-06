@@ -1,0 +1,14 @@
+package com.smartparking.parking.service;
+
+import com.smartparking.parking.entity.ParkingSlot;
+
+import java.util.List;
+
+public interface SlotService {
+
+    List<ParkingSlot> getAll();
+
+    ParkingSlot create(ParkingSlot slot);
+
+    ParkingSlot update(Long id, ParkingSlot slot);
+}
