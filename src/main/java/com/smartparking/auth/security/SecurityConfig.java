@@ -28,26 +28,10 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
             .authorizeHttpRequests(auth -> auth
-                // // 🔥 cực quan trọng
-                // .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // // 🔥 FIX CHÍNH Ở ĐÂY
-                // .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                // .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-
-                // .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
-                // .anyRequest().authenticated()
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().permitAll()
-            )
-
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            );
 
         return http.build();
     }

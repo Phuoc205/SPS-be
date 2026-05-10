@@ -1,12 +1,15 @@
 package com.smartparking.parking.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Table(name = "parking_lot")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParkingLot {
@@ -21,6 +24,13 @@ public class ParkingLot {
 
     private int capacity;
 
-    @OneToMany(mappedBy = "lot")
+    @JsonManagedReference
+    @OneToMany(
+            mappedBy = "lot",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<ParkingSlot> slots;
 }

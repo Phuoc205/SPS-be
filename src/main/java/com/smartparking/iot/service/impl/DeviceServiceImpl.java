@@ -50,4 +50,9 @@ public class DeviceServiceImpl implements DeviceService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    @Override
+    public List<Device> getByKeyword(String keyword) {
+        return repo.findByDeviceCodeContainingIgnoreCase(keyword);
+    }
 }

@@ -16,4 +16,6 @@ public interface DeviceService {
     Device update(Long id, Device device);
 
     void delete(Long id);
+
+    List<Device> getByKeyword(String keyword);
 }

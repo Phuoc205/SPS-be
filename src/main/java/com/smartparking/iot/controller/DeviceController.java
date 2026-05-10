@@ -16,11 +16,6 @@ public class DeviceController {
     @Autowired
     private DeviceService service;
 
-    @GetMapping
-    public ResponseEntity<List<Device>> getAll() {
-        return ResponseEntity.ok(service.getAll());
-    }
-
     @PostMapping
     public ResponseEntity<Device> create(@RequestBody Device device) {
         return ResponseEntity.ok(service.create(device));
@@ -35,5 +30,13 @@ public class DeviceController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Device>> getAll(@RequestParam(required = false) String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            return ResponseEntity.ok(service.getByKeyword(keyword)); 
+        }
+        return ResponseEntity.ok(service.getAll());
     }
 }
