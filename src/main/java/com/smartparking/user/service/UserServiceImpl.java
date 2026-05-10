@@ -1,5 +1,6 @@
-package com.smartparking.user.service;
 
+package com.smartparking.user.service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.smartparking.user.dto.response.UserResponse;
 import com.smartparking.user.entity.User;
 import com.smartparking.user.mapper.UserMapper;
@@ -15,6 +16,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository repo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponse> getAll(String keyword) {
@@ -43,6 +47,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return repo.save(user);
     }
 
