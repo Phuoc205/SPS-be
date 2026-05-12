@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pricing")
+@CrossOrigin(origins = "*")
 public class PricingController {
 
     @Autowired
@@ -18,10 +19,10 @@ public class PricingController {
         return ResponseEntity.ok(pricingService.getAllPricings());
     }
 
-    @GetMapping("/active/{userType}")
-    public ResponseEntity<?> getActivePrice(@PathVariable String userType) {
+    @GetMapping("/active/{vehicleType}")
+    public ResponseEntity<?> getActivePrice(@PathVariable String vehicleType) {
         try {
-            return ResponseEntity.ok(pricingService.getActivePriceByUserType(userType.toUpperCase()));
+            return ResponseEntity.ok(pricingService.getActivePriceByUserType(vehicleType));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -29,18 +30,20 @@ public class PricingController {
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Pricing pricing) {
-        if(pricing.getUserType() != null) {
-            pricing.setUserType(pricing.getUserType().toUpperCase());
+        try {
+            return ResponseEntity.ok(pricingService.createPricing(pricing));
+        } catch (RuntimeException e) {
+            // Trả 409 Conflict nếu trùng cấu hình
+            if (e.getMessage() != null && e.getMessage().startsWith("DUPLICATE")) {
+                return ResponseEntity.status(409).body(e.getMessage());
+            }
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok(pricingService.createPricing(pricing));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Pricing pricing) {
         try {
-            if(pricing.getUserType() != null) {
-                pricing.setUserType(pricing.getUserType().toUpperCase());
-            }
             return ResponseEntity.ok(pricingService.updatePricing(id, pricing));
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
@@ -53,7 +56,7 @@ public class PricingController {
             pricingService.deletePricing(id);
             return ResponseEntity.ok("Đã xóa cấu hình giá thành công!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi khi xóa cấu hình giá: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Lỗi khi xóa: " + e.getMessage());
         }
     }
 }
