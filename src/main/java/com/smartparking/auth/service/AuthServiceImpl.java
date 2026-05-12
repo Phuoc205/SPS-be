@@ -4,7 +4,7 @@ import com.smartparking.auth.dto.request.LoginRequest;
 import com.smartparking.auth.dto.request.RegisterRequest;
 import com.smartparking.auth.dto.response.AuthResponse;
 import com.smartparking.auth.repository.AccountRepository;
-import com.smartparking.auth.security.JwtService;
+import com.smartparking.security.JwtService;
 import com.smartparking.user.entity.User;
 import com.smartparking.user.entity.UserRole;
 

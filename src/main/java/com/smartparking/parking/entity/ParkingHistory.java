@@ -15,10 +15,15 @@ public class ParkingHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long sessionId;
+
     private Long userId;
 
     private String slotName;
 
     private LocalDateTime checkInTime;
+
     private LocalDateTime checkOutTime;
+
+    private Double amount;
 }
