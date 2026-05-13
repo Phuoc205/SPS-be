@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TicketRequest {
-
     private String ticketCode;
+
+    private String licensePlate;
 }

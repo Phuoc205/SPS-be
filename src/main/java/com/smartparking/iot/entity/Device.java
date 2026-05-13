@@ -13,13 +13,9 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String deviceCode; // ESP32-01, SENSOR-A1
+    private String deviceCode;
 
-    private String type; // SENSOR, GATE, CAMERA
-
-    private String location; // A1, B2
+    private String location;
 
     private boolean active;
-
-    private Long slotId;
 }

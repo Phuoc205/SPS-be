@@ -2,7 +2,10 @@ package com.smartparking.parking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.smartparking.payment.entity.Pricing;
+import com.smartparking.user.entity.Vehicle;
+import com.smartparking.user.entity.User;
+import com.smartparking.ticket.entity.Ticket;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,9 +18,11 @@ public class ParkingSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    @ManyToOne
+    private User user;
 
-    private String cardId;
+    @ManyToOne
+    private Vehicle vehicle;
 
     private LocalDateTime checkInTime;
 
@@ -26,8 +31,15 @@ public class ParkingSession {
     private String licensePlate;
 
     @ManyToOne
-    private Pricing price;
+    private ParkingSlot slot;
 
     @ManyToOne
-    private ParkingSlot slot;
+    private Ticket ticket;
+
+    @Column(name = "total_amount")
+    private Double totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private SessionStatus status = SessionStatus.ACTIVE;
 }

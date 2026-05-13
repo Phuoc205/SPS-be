@@ -2,6 +2,11 @@ package com.smartparking.payment.controller;
 
 import com.smartparking.payment.entity.Pricing;
 import com.smartparking.payment.service.PricingService;
+import com.smartparking.user.entity.UserRole;
+import com.smartparking.user.entity.VehicleType;
+import com.smartparking.payment.dto.request.PricingRequest;
+import com.smartparking.payment.entity.enumeration.PricingPlanType;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,42 +23,51 @@ public class PricingController {
         return ResponseEntity.ok(pricingService.getAllPricings());
     }
 
-    @GetMapping("/active/{userType}")
-    public ResponseEntity<?> getActivePrice(@PathVariable String userType) {
-        try {
-            return ResponseEntity.ok(pricingService.getActivePriceByUserType(userType.toUpperCase()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @GetMapping("/active")
+    public ResponseEntity<?> getActivePrice(
+            @RequestParam UserRole role,
+            @RequestParam VehicleType vehicleType,
+            @RequestParam PricingPlanType planType
+    ) {
+        return ResponseEntity.ok(
+                pricingService.getActivePricing(role, vehicleType, planType)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Pricing pricing) {
-        if(pricing.getUserType() != null) {
-            pricing.setUserType(pricing.getUserType().toUpperCase());
-        }
+    public ResponseEntity<?> create(@RequestBody PricingRequest request) {
+
+        Pricing pricing = new Pricing();
+        pricing.setUserRole(request.getUserRole());
+        pricing.setVehicleType(request.getVehicleType());
+        pricing.setPlanType(request.getPlanType());
+        pricing.setPrice(request.getPrice());
+        pricing.setActive(request.isActive());
+
         return ResponseEntity.ok(pricingService.createPricing(pricing));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Pricing pricing) {
-        try {
-            if(pricing.getUserType() != null) {
-                pricing.setUserType(pricing.getUserType().toUpperCase());
-            }
-            return ResponseEntity.ok(pricingService.updatePricing(id, pricing));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @RequestBody PricingRequest request
+    ) {
+
+        Pricing pricing = new Pricing();
+        pricing.setUserRole(request.getUserRole());
+        pricing.setVehicleType(request.getVehicleType());
+        pricing.setPlanType(request.getPlanType());
+        pricing.setPrice(request.getPrice());
+        pricing.setActive(request.isActive());
+
+        return ResponseEntity.ok(
+                pricingService.updatePricing(id, pricing)
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            pricingService.deletePricing(id);
-            return ResponseEntity.ok("Đã xóa cấu hình giá thành công!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi khi xóa cấu hình giá: " + e.getMessage());
-        }
+        pricingService.deletePricing(id);
+        return ResponseEntity.ok("Deleted pricing successfully");
     }
 }

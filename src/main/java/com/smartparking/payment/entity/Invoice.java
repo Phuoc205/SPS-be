@@ -23,7 +23,4 @@ public class Invoice {
 
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
-
-    private String type;
-    // STUDENT, STAFF, VISITOR
 }

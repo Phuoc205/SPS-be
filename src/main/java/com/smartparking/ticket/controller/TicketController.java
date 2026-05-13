@@ -15,8 +15,8 @@ public class TicketController {
     private TicketService service;
 
     @PostMapping("/issue")
-    public ResponseEntity<?> issue(@RequestParam String plate) {
-        return ResponseEntity.ok(service.issue(plate));
+    public ResponseEntity<?> issue(@RequestBody TicketIssueRequest request) {
+        return ResponseEntity.ok(service.issue(request));
     }
 
     @PostMapping("/validate")

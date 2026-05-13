@@ -9,7 +9,7 @@ import com.smartparking.payment.service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.List;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -22,22 +22,25 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createPayment(PaymentRequest request) {
 
-        double amount = billingService.calculateAmount(request.getSessionId());
+        double amount =
+                billingService.calculateAmount(
+                        request.getSessionId()
+                );
 
         Payment payment = new Payment();
-        payment.setUserId(request.getUserId());
-        payment.setAmount(amount);
-        payment.setStatus(PaymentStatus.PENDING);
 
+        payment.setAmount(amount);
+
+        payment.setStatus(PaymentStatus.PENDING);
 
         repo.save(payment);
 
         return new PaymentResponse(
-            payment.getId(),
-            payment.getUserId(),
-            payment.getAmount(),
-            payment.getStatus().name()
-    );
+                payment.getId(),
+                request.getUserId(),
+                payment.getAmount(),
+                payment.getStatus().name()
+        );
     }
 
     @Override
@@ -54,5 +57,10 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.getId(),
                 payment.getStatus().name()
         );
+    }
+
+    @Override
+    public List<Payment> getPaymentsByUserId(Long userId) {
+        return repo.findByInvoice_UserId(userId);
     }
 }

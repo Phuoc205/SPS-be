@@ -7,5 +7,5 @@ public interface TicketService {
 
     TicketResponse validate(TicketRequest request);
 
-    TicketResponse issue(String plate);
+    TicketResponse issue(TicketIssueRequest request);
 }

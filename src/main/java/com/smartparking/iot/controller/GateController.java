@@ -1,11 +1,11 @@
 package com.smartparking.iot.controller;
-import com.smartparking.iot.dto.request.GateControlRequest;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
 
 import com.smartparking.iot.service.GateService;
+import com.smartparking.iot.dto.request.GateControlRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/api/gates")
 @RequiredArgsConstructor
@@ -13,7 +13,7 @@ public class GateController {
 
     private final GateService gateService;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getGates() {
         return ResponseEntity.ok(gateService.getGates());
     }
@@ -37,7 +37,7 @@ public class GateController {
     }
 
     @GetMapping("/logs")
-    public ResponseEntity<?> logs() {
+    public ResponseEntity<?> getLogs() {
         return ResponseEntity.ok(gateService.getLogs());
     }
 }

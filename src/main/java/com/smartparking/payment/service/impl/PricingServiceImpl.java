@@ -3,10 +3,14 @@ package com.smartparking.payment.service.impl;
 import com.smartparking.payment.entity.Pricing;
 import com.smartparking.payment.repository.PricingRepository;
 import com.smartparking.payment.service.PricingService;
+import com.smartparking.user.entity.UserRole;
+import com.smartparking.user.entity.VehicleType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.smartparking.payment.entity.enumeration.PricingPlanType;
+
 @Service
 public class PricingServiceImpl implements PricingService {
 
@@ -14,49 +18,64 @@ public class PricingServiceImpl implements PricingService {
     private PricingRepository pricingRepository;
 
     @Override
-    public List<Pricing> getAllPricings() {
-        return pricingRepository.findAll();
-    }
-
-    @Override
-    public Pricing getActivePriceByUserType(String userType) {
-        return pricingRepository.findByUserTypeAndActiveTrue(userType)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy cấu hình giá đang hoạt động cho: " + userType));
+    public Pricing getActivePricing(
+            UserRole userRole,
+            VehicleType vehicleType,
+            PricingPlanType planType
+    ) {
+        return pricingRepository
+                .findByUserRoleAndVehicleTypeAndPlanTypeAndActiveTrue(
+                        userRole,
+                        vehicleType,
+                        planType
+                )
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy pricing")
+                );
     }
 
     @Override
     public Pricing createPricing(Pricing pricing) {
-        if (pricing.isActive()) {
-            deactivateOldPricing(pricing.getUserType());
-        }
+
+        // đảm bảo chỉ 1 active per (role, vehicle, plan)
+        pricingRepository
+                .findByUserRoleAndVehicleTypeAndPlanTypeAndActiveTrue(
+                        pricing.getUserRole(),
+                        pricing.getVehicleType(),
+                        pricing.getPlanType()
+                )
+                .ifPresent(old -> {
+                    old.setActive(false);
+                    pricingRepository.save(old);
+                });
+
+        pricing.setActive(true);
         return pricingRepository.save(pricing);
     }
 
     @Override
-    public Pricing updatePricing(Long id, Pricing updatedPricing) {
-        Pricing existing = pricingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy cấu hình giá với ID: " + id));
+    public Pricing updatePricing(Long id, Pricing req) {
 
-        existing.setUserType(updatedPricing.getUserType());
-        existing.setPricePerHour(updatedPricing.getPricePerHour());
-        
-        if (updatedPricing.isActive() && !existing.isActive()) {
-            deactivateOldPricing(updatedPricing.getUserType());
-        }
-        existing.setActive(updatedPricing.isActive());
+        Pricing existing = pricingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy pricing"));
+
+        existing.setUserRole(req.getUserRole());
+        existing.setVehicleType(req.getVehicleType());
+        existing.setPlanType(req.getPlanType());
+        existing.setPrice(req.getPrice());
+        existing.setDurationValue(req.getDurationValue());
+        existing.setActive(req.isActive());
 
         return pricingRepository.save(existing);
     }
 
     @Override
-    public void deletePricing(Long id) {
-        pricingRepository.deleteById(id);
+    public List<Pricing> getAllPricings() {
+        return pricingRepository.findAll();
     }
 
-    private void deactivateOldPricing(String userType) {
-        pricingRepository.findByUserTypeAndActiveTrue(userType).ifPresent(oldPricing -> {
-            oldPricing.setActive(false);
-            pricingRepository.save(oldPricing);
-        });
+    @Override
+    public void deletePricing(Long id) {
+        pricingRepository.deleteById(id);
     }
 }

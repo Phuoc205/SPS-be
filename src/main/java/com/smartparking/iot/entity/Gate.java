@@ -6,15 +6,11 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Data
-public class Gate {
+@EqualsAndHashCode(callSuper = true)
+public class Gate extends Device {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Enumerated(EnumType.STRING)
+    private GateType type;
 
-    private String name; // Gate A, Gate B
-    private String type; // ENTRY / EXIT
-    private String location;
-
-    private boolean status; // OPEN / CLOSED
+    private boolean opened;
 }

@@ -1,7 +1,9 @@
 package com.smartparking.iot.entity;
+
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -13,11 +15,10 @@ public class SensorEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long deviceId;
-    private Long slotId;
+    @ManyToOne
+    private Sensor sensor;
 
     private boolean occupied;
 
-    @Column(name = "created_at")
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
 }

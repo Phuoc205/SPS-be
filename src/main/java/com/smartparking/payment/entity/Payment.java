@@ -15,9 +15,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-
-    private Long invoiceId;
+    @OneToOne
+    private Invoice invoice;
 
     private Double amount;
 

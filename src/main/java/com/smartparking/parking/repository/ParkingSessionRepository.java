@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ParkingSessionRepository extends JpaRepository<ParkingSession, Long> {
 
-    Optional<ParkingSession> findByCardIdAndCheckOutTimeIsNull(String cardId);
+    Optional<ParkingSession> findByUser_CardIdAndCheckOutTimeIsNull(String cardId);
     @Query("""
         SELECT COUNT(p)
         FROM ParkingSession p
@@ -23,4 +23,5 @@ public interface ParkingSessionRepository extends JpaRepository<ParkingSession, 
         @Param("end") LocalDateTime end
     );
     List<ParkingSession> findTop10ByOrderByCheckInTimeDesc();
+    List<ParkingSession> findByUser_Id(Long userId);
 }

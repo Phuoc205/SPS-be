@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.smartparking.user.entity.Vehicle;
+import com.smartparking.user.entity.User;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -15,13 +18,20 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ticketCode; // QR / random
+    private String ticketCode;
 
-    private String vehiclePlate;
+    @Enumerated(EnumType.STRING)
+    private TicketType type;
 
-    private LocalDateTime issuedAt = LocalDateTime.now();
+    @ManyToOne
+    private User user;
 
-    private boolean used;
+    @ManyToOne
+    private Vehicle vehicle;
 
-    private LocalDateTime usedAt;
+    private LocalDateTime issuedAt;
+
+    private LocalDateTime expiredAt;
+
+    private boolean active;
 }

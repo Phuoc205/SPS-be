@@ -34,46 +34,29 @@ public class DashboardService {
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
         long totalSlots = slotRepository.count();
+        long occupiedSlots = slotRepository.countByOccupied(true);
+        long availableSlots = slotRepository.countByOccupied(false);
 
-        long occupiedSlots =
-            slotRepository.countByOccupied(true);
+        int fillPercentage = totalSlots == 0
+                ? 0
+                : (int) ((occupiedSlots * 100) / totalSlots);
 
-        long availableSlots =
-            slotRepository.countByOccupied(false);
-
-        int fillPercentage =
-                totalSlots == 0
-                        ? 0
-                        : (int) ((occupiedSlots * 100) / totalSlots);
-
-        
         double todayRevenue = paymentRepository.getRevenueBetween(start, end);
+        double yesterdayRevenue = paymentRepository.getYesterdayRevenue();
 
-        double yesterdayRevenue =
-                paymentRepository.getYesterdayRevenue();
-
-        double revenuePercent =
-                yesterdayRevenue == 0
-                        ? 100
-                        : ((todayRevenue - yesterdayRevenue)
-                        / yesterdayRevenue) * 100;
+        double revenuePercent = yesterdayRevenue == 0
+                ? 100
+                : ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
 
         long totalVehiclesToday =
                 parkingSessionRepository.countTodayVehicles(start, end);
 
-        long totalDevices =
-                deviceRepository.count();
-
-        long activeDevices =
-                deviceRepository.countByActive(true);
-
-        long offlineDevices =
-                totalDevices - activeDevices;
+        long totalDevices = deviceRepository.count();
+        long activeDevices = deviceRepository.countByActive(true);
+        long offlineDevices = totalDevices - activeDevices;
 
         long newUsersToday = userRepository.countByCreatedAtBetween(start, end);
-
-        long totalActiveUsers =
-                userRepository.countActiveUsers();
+        long totalActiveUsers = userRepository.countActiveUsers();
 
         return DashboardSummaryResponse.builder()
                 .slots(
@@ -110,41 +93,35 @@ public class DashboardService {
     public List<RecentActivityResponse> getRecentActivities() {
 
         List<ParkingSession> sessions =
-                parkingSessionRepository
-                        .findTop10ByOrderByCheckInTimeDesc();
+                parkingSessionRepository.findTop10ByOrderByCheckInTimeDesc();
 
         return sessions.stream()
-            .map(session -> {
+                .map(session -> {
 
-                boolean checkedOut =
-                        session.getCheckOutTime() != null;
+                    boolean checkedOut = session.getCheckOutTime() != null;
 
-                return RecentActivityResponse.builder()
-                        .id(session.getId())
-                        .licensePlate(session.getLicensePlate())
-                        .action(
-                                checkedOut
-                                        ? "CHECK_OUT"
-                                        : "CHECK_IN"
-                        )
-                        .gateName(
-                                session.getSlot() != null
-                                        ? session.getSlot().getSlotName()
-                                        : "Unknown Slot"
-                        )
-                        .time(
-                                checkedOut
-                                        ? session.getCheckOutTime()
-                                        : session.getCheckInTime()
-                        )
-                        .status("SUCCESS")
-                        .fee(
-                                checkedOut && session.getPrice() != null
-                                        ? session.getPrice().getPricePerHour()
-                                        : null
-                        )
-                        .build();
-            })
-            .toList();
+                    return RecentActivityResponse.builder()
+                            .id(session.getId())
+                            .licensePlate(session.getLicensePlate())
+                            .action(checkedOut ? "CHECK_OUT" : "CHECK_IN")
+                            .gateName(
+                                    session.getSlot() != null
+                                            ? session.getSlot().getSlotName()
+                                            : "Unknown Slot"
+                            )
+                            .time(
+                                    checkedOut
+                                            ? session.getCheckOutTime()
+                                            : session.getCheckInTime()
+                            )
+                            .status("SUCCESS")
+                            .fee(
+                                    checkedOut
+                                            ? session.getTotalAmount() // ✅ KEY CHANGE
+                                            : null
+                            )
+                            .build();
+                })
+                .toList();
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/parking")
 public class ParkingController {
@@ -25,5 +27,9 @@ public class ParkingController {
         return ResponseEntity.ok(service.checkOut(request.getCardId()));
     }
 
-    
+    @GetMapping("/history/user/{userId}")
+    public ResponseEntity<List<ParkingHistoryResponse>> getHistoryByUser(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(service.getHistoryByUser(userId));
+    }
 }

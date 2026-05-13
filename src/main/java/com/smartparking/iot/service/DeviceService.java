@@ -1,21 +1,50 @@
 package com.smartparking.iot.service;
 
 import com.smartparking.iot.entity.Device;
-
+import com.smartparking.iot.repository.DeviceRepository;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 import java.util.List;
-import java.util.Optional;
 
-public interface DeviceService {
+@Service
+@RequiredArgsConstructor
+public class DeviceService {
 
-    List<Device> getAll();
+    private final DeviceRepository repo;
 
-    Optional<Device> getById(Long id);
+    public List<Device> getAll() {
+        return repo.findAll();
+    }
 
-    Device create(Device device);
+    public Device getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+    }
 
-    Device update(Long id, Device device);
+    public Device create(Device device) {
+        device.setActive(true);
+        return repo.save(device);
+    }
 
-    void delete(Long id);
+    public Device update(Long id, Device req) {
 
-    List<Device> getByKeyword(String keyword);
+        Device device = getById(id);
+
+        device.setDeviceCode(req.getDeviceCode());
+        device.setLocation(req.getLocation());
+        device.setActive(req.isActive());
+
+        return repo.save(device);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
+
+    public List<Device> search(String keyword) {
+        return repo.findAll().stream()
+                .filter(d -> d.getDeviceCode() != null &&
+                        d.getDeviceCode().toLowerCase().contains(keyword.toLowerCase()))
+                .toList();
+    }
 }

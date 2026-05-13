@@ -2,11 +2,14 @@ package com.smartparking.payment.controller;
 
 import com.smartparking.payment.dto.request.PaymentRequest;
 import com.smartparking.payment.dto.response.*;
+import com.smartparking.payment.entity.Payment;
 import com.smartparking.payment.service.PaymentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -23,5 +26,10 @@ public class PaymentController {
     @PostMapping("/{id}/pay")
     public ResponseEntity<PayResponse> pay(@PathVariable Long id) {
         return ResponseEntity.ok(service.pay(id));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Payment>> getByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.getPaymentsByUserId(userId));
     }
 }

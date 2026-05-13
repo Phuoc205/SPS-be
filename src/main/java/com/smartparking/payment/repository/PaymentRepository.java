@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    List<Payment> findByUserId(Long userId);
-
     List<Payment> findByStatus(String status);
 
     @Query("""
@@ -19,6 +17,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
         FROM Payment p
         WHERE p.createdAt >= :start
         AND p.createdAt < :end
+        AND p.status = 'PAID'
     """)
     double getRevenueBetween(
         @Param("start") LocalDateTime start,
@@ -27,8 +26,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query(value = """
         SELECT COALESCE(SUM(amount), 0)
-        FROM payments
-        WHERE DATE(payment_date) = CURRENT_DATE - INTERVAL '1 day'
+        FROM payment
+        WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
+        AND created_at < CURRENT_DATE
+        AND status = 'PAID'
     """, nativeQuery = true)
     double getYesterdayRevenue();
+
+    List<Payment> findByInvoice_UserId(Long userId);
 }
