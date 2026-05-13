@@ -9,4 +9,5 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
 
     Optional<Device> findByDeviceCode(String code);
     List<Device> findByDeviceCodeContainingIgnoreCase(String keyword);
+    long countByActive(boolean active);
 }

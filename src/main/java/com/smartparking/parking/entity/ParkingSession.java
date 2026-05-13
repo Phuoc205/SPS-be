@@ -23,6 +23,8 @@ public class ParkingSession {
 
     private LocalDateTime checkOutTime;
 
+    private String licensePlate;
+
     @ManyToOne
     private Pricing price;
 

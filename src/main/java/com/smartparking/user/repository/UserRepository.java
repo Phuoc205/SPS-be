@@ -4,6 +4,7 @@ import com.smartparking.user.entity.User;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -19,4 +20,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
            OR u.username LIKE %:keyword%
     """)
     List<User> search(@Param("keyword") String keyword);
+
+    long countByCreatedAtBetween(
+            LocalDateTime start,
+            LocalDateTime end
+    );
+
+    @Query("""
+        SELECT COUNT(u)
+        FROM User u
+    """)
+    long countActiveUsers();
 }
